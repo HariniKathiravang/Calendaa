@@ -19,6 +19,7 @@ interface Props {
   onSearchChange: (v: string) => void;
   userMenu: ReactNode;
   activeFilterCount: number;
+  filters: { department?: string; year?: string; section?: string };
 }
 
 export function CalendarHeader({
@@ -33,9 +34,16 @@ export function CalendarHeader({
   onSearchChange,
   userMenu,
   activeFilterCount,
+  filters,
 }: Props) {
   const titleFormat =
     view === "day" ? "EEEE, MMMM d, yyyy" : view === "week" ? "MMMM yyyy" : "MMMM yyyy";
+
+  const activeFilterLabels = [];
+  if (filters.department && filters.department !== "all") activeFilterLabels.push(filters.department.toUpperCase());
+  if (filters.year && filters.year !== "all") activeFilterLabels.push(filters.year);
+  if (filters.section && filters.section !== "all") activeFilterLabels.push(filters.section);
+  const filterSummary = activeFilterLabels.length > 0 ? `(${activeFilterLabels.join(", ")})` : "";
 
   return (
     <header className="sticky top-0 z-30 border-b border-border/70 bg-white/90 backdrop-blur-md">
@@ -45,8 +53,13 @@ export function CalendarHeader({
             <GraduationCap className="h-5 w-5" />
           </div>
           <div className="min-w-0">
-            <h1 className="truncate text-lg font-semibold tracking-tight text-foreground">
+            <h1 className="flex items-center gap-2 truncate text-lg font-semibold tracking-tight text-foreground">
               Academic Calendar
+              {filterSummary && (
+                <span className="text-sm font-medium text-primary">
+                  {filterSummary}
+                </span>
+              )}
             </h1>
             <p className="truncate text-xs text-muted-foreground">{format(currentDate, titleFormat)}</p>
           </div>

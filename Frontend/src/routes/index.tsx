@@ -126,6 +126,7 @@ function CalendarPage() {
         onSearchChange={(v) => setFilters({ ...filters, search: v })}
         userMenu={<UserMenu />}
         activeFilterCount={activeFilterCount}
+        filters={filters}
       />
 
       <main className="mx-auto max-w-[1400px] px-4 py-6 md:px-6">
