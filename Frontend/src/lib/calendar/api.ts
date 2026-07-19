@@ -1,9 +1,18 @@
 /**
  * Thin HTTP client for the Calendaa backend API.
- * All API calls go through here — handles base URL, auth headers, and errors.
+ *
+ * In production (combined Vercel deployment):
+ *   BASE_URL = '' → calls go to /api/events on the SAME domain (no CORS)
+ *
+ * In local development:
+ *   BASE_URL = 'http://localhost:8000' → calls go to http://localhost:8000/api/events
+ *   (CORS allowed via backend ALLOWED_ORIGINS config)
+ *   Override with VITE_API_URL env var if your backend is on a different port.
  */
 
-const BASE_URL = (import.meta.env.VITE_API_URL as string) || "http://localhost:8000";
+const BASE_URL: string = import.meta.env.PROD
+  ? ""
+  : (import.meta.env.VITE_API_URL as string | undefined) ?? "http://localhost:8000";
 
 const TOKEN_KEY = "calendaa_token";
 
@@ -36,7 +45,6 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     throw new Error(body?.detail ?? `HTTP ${res.status}`);
   }
 
-  // 204 No Content
   if (res.status === 204) return undefined as T;
 
   return res.json() as Promise<T>;
@@ -56,7 +64,7 @@ export interface LoginResponse {
 }
 
 export async function apiLogin(username: string, password: string): Promise<LoginResponse> {
-  return request<LoginResponse>("/auth/login", {
+  return request<LoginResponse>("/api/auth/login", {
     method: "POST",
     body: JSON.stringify({ username, password }),
   });
@@ -92,19 +100,19 @@ export async function apiFetchEvents(filters: EventFilters = {}): Promise<ApiEve
   if (filters.section && filters.section !== "all") params.set("section", filters.section);
   if (filters.search?.trim()) params.set("search", filters.search.trim());
   const qs = params.toString() ? `?${params.toString()}` : "";
-  return request<ApiEvent[]>(`/events${qs}`);
+  return request<ApiEvent[]>(`/api/events${qs}`);
 }
 
 export async function apiCreateEvent(data: Omit<ApiEvent, "id">): Promise<ApiEvent> {
-  return request<ApiEvent>("/events", { method: "POST", body: JSON.stringify(data) });
+  return request<ApiEvent>("/api/events", { method: "POST", body: JSON.stringify(data) });
 }
 
 export async function apiUpdateEvent(id: string, data: Omit<ApiEvent, "id">): Promise<ApiEvent> {
-  return request<ApiEvent>(`/events/${id}`, { method: "PUT", body: JSON.stringify(data) });
+  return request<ApiEvent>(`/api/events/${id}`, { method: "PUT", body: JSON.stringify(data) });
 }
 
 export async function apiDeleteEvent(id: string): Promise<void> {
-  return request<void>(`/events/${id}`, { method: "DELETE" });
+  return request<void>(`/api/events/${id}`, { method: "DELETE" });
 }
 
 // ── Admin — HODs ──────────────────────────────────────────────────────────────
@@ -127,15 +135,15 @@ export interface CreateHodData {
 }
 
 export async function apiFetchHods(): Promise<ApiHod[]> {
-  return request<ApiHod[]>("/admin/hods");
+  return request<ApiHod[]>("/api/admin/hods");
 }
 
 export async function apiCreateHod(data: CreateHodData): Promise<ApiHod> {
-  return request<ApiHod>("/admin/hods", { method: "POST", body: JSON.stringify(data) });
+  return request<ApiHod>("/api/admin/hods", { method: "POST", body: JSON.stringify(data) });
 }
 
 export async function apiDeleteHod(id: number): Promise<void> {
-  return request<void>(`/admin/hods/${id}`, { method: "DELETE" });
+  return request<void>(`/api/admin/hods/${id}`, { method: "DELETE" });
 }
 
 // ── Lookup ────────────────────────────────────────────────────────────────────
@@ -146,5 +154,5 @@ export interface ApiDepartment {
 }
 
 export async function apiFetchDepartments(): Promise<ApiDepartment[]> {
-  return request<ApiDepartment[]>("/departments");
+  return request<ApiDepartment[]>("/api/departments");
 }

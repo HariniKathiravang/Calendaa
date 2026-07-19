@@ -17,11 +17,14 @@ app = FastAPI(
     title="Calendaa API",
     description="Academic Calendar backend — events, departments, HOD management",
     version="1.0.0",
-    docs_url="/docs",
-    redoc_url="/redoc",
+    # Swagger accessible locally at /api/docs
+    docs_url="/api/docs",
+    redoc_url="/api/redoc",
+    openapi_url="/api/openapi.json",
 )
 
-# CORS — origins are configured via ALLOWED_ORIGINS env var
+# CORS — only needed for local dev (frontend on :8081, backend on :8000).
+# In the combined Vercel deployment everything is same-origin so CORS is a no-op.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=get_allowed_origins(),
@@ -30,13 +33,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Register routers
-app.include_router(auth.router)
-app.include_router(events.router)
-app.include_router(admin.router)
-app.include_router(lookup.router)
+# All routes are under /api so they align with Vercel's routing rule:
+#   /api/* → Python function
+API = "/api"
+app.include_router(auth.router,   prefix=API)
+app.include_router(events.router, prefix=API)
+app.include_router(admin.router,  prefix=API)
+app.include_router(lookup.router, prefix=API)
 
 
-@app.get("/", tags=["Health"])
+@app.get("/api/health", tags=["Health"])
+@app.get("/", tags=["Health"], include_in_schema=False)
 def health():
     return {"status": "ok", "service": "Calendaa API", "version": "1.0.0"}
