@@ -1,0 +1,44 @@
+# Python virtual environment
+venv/
+.venv/
+env/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Database files — never commit these
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment variables — NEVER commit real secrets
+.env
+# .env.example is safe to commit (no real values)
+# .env.vercel is safe to commit (template only)
+
+# Alembic
+alembic/versions/*.pyc
+
+# Logs
+*.log
+logs/
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Vercel output
+.vercel/

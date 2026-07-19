@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.output/
+.vercel/
+
+# Environment variables — NEVER commit real secrets
+.env
+.env.local
+.env.production
+# .env.vercel is safe (template only, no real values)
+
+# TanStack Start / Nitro / Vite cache
+.nitro/
+.cache/
+*.tsbuildinfo
+
+# TypeScript
+*.js.map
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
