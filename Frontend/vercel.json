@@ -1,9 +1,0 @@
-{
-  "buildCommand": "npm run build && node -e \"const fs=require('fs');const path=require('path');const src=path.resolve('.output/public');const dest=path.resolve('public');fs.rmSync(dest,{recursive:true,force:true});fs.mkdirSync(dest,{recursive:true});for(const entry of fs.readdirSync(src,{withFileTypes:true})){const from=path.join(src,entry.name);const to=path.join(dest,entry.name);if(entry.isDirectory())fs.cpSync(from,to,{recursive:true});else fs.copyFileSync(from,to);} \"",
-  "installCommand": "npm install",
-  "outputDirectory": "public",
-  "framework": null,
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
-  ]
-}
