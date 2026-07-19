@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     # In production (Vercel), set this to your deployed frontend URL.
     # Example: https://calendaa.vercel.app,https://calendaa-admin.vercel.app
     ALLOWED_ORIGINS: str = (
+        "https://calendaafrontend.vercel.app,"
         "http://localhost:3000,"
         "http://localhost:5173,"
         "http://localhost:4173,"
