@@ -1,16 +1,11 @@
 /**
  * Thin HTTP client for the Calendaa backend API.
- *
- * In production (combined Vercel deployment):
- *   BASE_URL = '' → calls go to /api/events on the SAME domain (no CORS)
- *
- * In local development:
- *   BASE_URL = 'http://localhost:8000' → calls go to http://localhost:8000/api/events
- *   (CORS allowed via backend ALLOWED_ORIGINS config)
- *   Override with VITE_API_URL env var if your backend is on a different port.
+ * All API calls go through here — handles base URL, auth headers, and errors.
  */
 
-const BASE_URL = (import.meta.env.VITE_API_URL as string) || "http://localhost:8000";
+// Safely handle trailing slashes in the env var to prevent Vercel 308 Redirect / CORS errors
+const rawBaseUrl = (import.meta.env.VITE_API_URL as string) || "http://localhost:8000";
+const BASE_URL = rawBaseUrl.endsWith("/") ? rawBaseUrl.slice(0, -1) : rawBaseUrl;
 
 const TOKEN_KEY = "calendaa_token";
 
@@ -36,13 +31,16 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
+  // Ensure path starts with a slash
+  const safePath = path.startsWith("/") ? path : `/${path}`;
+  const res = await fetch(`${BASE_URL}${safePath}`, { ...options, headers });
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({ detail: res.statusText }));
     throw new Error(body?.detail ?? `HTTP ${res.status}`);
   }
 
+  // 204 No Content
   if (res.status === 204) return undefined as T;
 
   return res.json() as Promise<T>;
