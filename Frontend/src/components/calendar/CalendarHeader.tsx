@@ -55,11 +55,6 @@ export function CalendarHeader({
           <div className="min-w-0">
             <h1 className="flex items-center gap-2 truncate text-lg font-semibold tracking-tight text-foreground">
               Academic Calendar
-              {filterSummary && (
-                <span className="text-sm font-medium text-primary">
-                  {filterSummary}
-                </span>
-              )}
             </h1>
             <p className="truncate text-xs text-muted-foreground">{format(currentDate, titleFormat)}</p>
           </div>
@@ -69,14 +64,6 @@ export function CalendarHeader({
           <Button variant="outline" size="sm" onClick={onToday} className="rounded-full">
             Today
           </Button>
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" onClick={onPrev} className="rounded-full">
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={onNext} className="rounded-full">
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
           <Tabs value={view} onValueChange={(v) => onViewChange(v as CalendarView)}>
             <TabsList className="rounded-full">
               <TabsTrigger value="month" className="rounded-full">Month</TabsTrigger>
@@ -87,6 +74,11 @@ export function CalendarHeader({
         </div>
 
         <div className="flex flex-1 items-center justify-end gap-2">
+          {filterSummary && (
+            <div className="hidden md:flex items-center rounded-full bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary border border-primary/20">
+              {filterSummary}
+            </div>
+          )}
           <div className="relative hidden md:block">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { addDays, addMonths, addWeeks } from "date-fns";
-import { Plus } from "lucide-react";
+import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { CalendarHeader, type CalendarView } from "@/components/calendar/CalendarHeader";
 import { MonthView } from "@/components/calendar/MonthView";
@@ -74,6 +74,16 @@ function CalendarPage() {
     else setCurrentDate((d) => addDays(d, 1));
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.key === "ArrowLeft") handlePrev();
+      else if (e.key === "ArrowRight") handleNext();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [view]);
+
   const activeFilterCount =
     (filters.department !== "all" ? 1 : 0) +
     (filters.year !== "all" ? 1 : 0) +
@@ -129,7 +139,23 @@ function CalendarPage() {
         filters={filters}
       />
 
-      <main className="mx-auto max-w-[1400px] px-4 py-6 md:px-6">
+      <main className="mx-auto max-w-[1400px] px-4 py-6 md:px-6 relative group">
+        <Button
+          variant="outline"
+          size="icon"
+          className="absolute left-2 top-1/2 z-10 hidden -translate-y-1/2 rounded-full bg-background/80 shadow-md backdrop-blur transition-all hover:scale-110 hover:bg-background md:flex"
+          onClick={handlePrev}
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          className="absolute right-2 top-1/2 z-10 hidden -translate-y-1/2 rounded-full bg-background/80 shadow-md backdrop-blur transition-all hover:scale-110 hover:bg-background md:flex"
+          onClick={handleNext}
+        >
+          <ChevronRight className="h-5 w-5" />
+        </Button>
         {view === "month" && (
           <MonthView
             currentDate={currentDate}
