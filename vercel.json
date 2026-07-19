@@ -1,6 +1,6 @@
 {
   "framework": null,
-  "buildCommand": "cd Frontend && npm install && npx cross-env NITRO_PRESET=static npm run build",
+  "buildCommand": "cd Frontend && npm install && NITRO_PRESET=static npm run build",
   "outputDirectory": "Frontend/.output/public",
   "functions": {
     "api/index.py": {
