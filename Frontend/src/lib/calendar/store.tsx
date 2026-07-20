@@ -71,29 +71,48 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
   const [events, setEvents] = useState<AcademicEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<Filters>(() => loadSavedFilters());
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      const stored = localStorage.getItem("calendaa_user");
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
 
   // Restore token-based login and persisted filters on startup
   useEffect(() => {
     const token = getToken();
-    if (!token) return;
+    if (!token) {
+      localStorage.removeItem("calendaa_user");
+      setUser(null);
+      return;
+    }
 
     let active = true;
     (async () => {
       try {
         const me = await apiMe();
         if (!active) return;
-        setUser({
+        
+        const fetchedUser = {
           name: me.name,
           email: me.email,
           role: me.role as Role,
           department: me.department,
-        });
+        };
+        
+        setUser(fetchedUser);
+        localStorage.setItem("calendaa_user", JSON.stringify(fetchedUser));
+        
         if (me.department) {
           setFilters((prev) => ({ ...prev, department: me.department! }));
         }
       } catch (err) {
         clearToken();
+        localStorage.removeItem("calendaa_user");
+        setUser(null);
       }
     })();
 
@@ -145,12 +164,15 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (username: string, password: string, department?: string) => {
     const res = await apiLogin(username, password, department);
     setToken(res.access_token);
-    setUser({
+    const authUser = {
       name: res.user.name,
       email: res.user.email,
       role: res.user.role as Role,
       department: res.user.department,
-    });
+    };
+    
+    setUser(authUser);
+    localStorage.setItem("calendaa_user", JSON.stringify(authUser));
 
     // Auto-lock filters for students or HODs to their department
     if (res.user.department) {
@@ -160,6 +182,7 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(() => {
     clearToken();
+    localStorage.removeItem("calendaa_user");
     setUser(null);
   }, []);
 
