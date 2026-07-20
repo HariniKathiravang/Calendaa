@@ -59,10 +59,10 @@ export interface LoginResponse {
   };
 }
 
-export async function apiLogin(username: string, password: string): Promise<LoginResponse> {
+export async function apiLogin(username: string, password: string, department?: string): Promise<LoginResponse> {
   return request<LoginResponse>("/auth/login", {
     method: "POST",
-    body: JSON.stringify({ username, password }),
+    body: JSON.stringify({ username, password, department }),
   });
 }
 

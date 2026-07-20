@@ -6,8 +6,24 @@ from app.auth.jwt_handler import create_access_token
 from app.schemas.auth import TokenResponse, UserOut
 
 
-def login(username: str, password: str, db: Session) -> TokenResponse | None:
-    # Try admin first
+def login(username: str, password: str, department: str | None, db: Session) -> TokenResponse | None:
+    # 1. Student Login
+    if username.lower() == "student":
+        if password == "eec123" and department:
+            token = create_access_token({
+                "sub": "student",
+                "role": "student",
+                "name": "Student",
+                "email": "student@college.edu",
+                "department": department,
+            })
+            return TokenResponse(
+                access_token=token,
+                user=UserOut(name="Student", email="student@college.edu", role="student", department=department),
+            )
+        return None
+
+    # 2. Try admin first
     admin = db.query(Admin).filter(Admin.username == username).first()
     if admin and verify_password(password, admin.hashed_password):
         token = create_access_token({

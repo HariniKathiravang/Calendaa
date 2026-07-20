@@ -28,7 +28,7 @@ interface CalendarStore {
   filters: Filters;
   setFilters: (f: Filters) => void;
   user: AuthUser | null;
-  login: (username: string, password: string) => Promise<void>;
+  login: (username: string, password: string, department?: string) => Promise<void>;
   logout: () => void;
   filteredEvents: AcademicEvent[];
   refreshEvents: () => Promise<void>;
@@ -83,15 +83,20 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
     });
   }, [events, filters]);
 
-  const login = useCallback(async (username: string, password: string) => {
-    const res = await apiLogin(username, password);
+  const login = useCallback(async (username: string, password: string, department?: string) => {
+    const res = await apiLogin(username, password, department);
     setToken(res.access_token);
     setUser({
       name: res.user.name,
       email: res.user.email,
-      role: res.user.role,
+      role: res.user.role as Role,
       department: res.user.department,
     });
+    
+    // Auto-lock filters for students or HODs to their department
+    if (res.user.department) {
+      setFilters(prev => ({ ...prev, department: res.user.department! }));
+    }
   }, []);
 
   const logout = useCallback(() => {

@@ -3,6 +3,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { DEPARTMENTS, YEARS, SECTIONS, type Filters } from "@/lib/calendar/types";
+import { useCalendar } from "@/lib/calendar/store";
 
 interface Props {
   open: boolean;
@@ -12,8 +13,15 @@ interface Props {
 }
 
 export function FilterDrawer({ open, onOpenChange, filters, onChange }: Props) {
+  const { user } = useCalendar();
+
   const reset = () =>
-    onChange({ department: "all", year: "all", section: "all", search: filters.search });
+    onChange({ 
+      department: user?.role === "admin" ? "all" : (user?.department || "all"), 
+      year: "all", 
+      section: "all", 
+      search: filters.search 
+    });
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -25,23 +33,25 @@ export function FilterDrawer({ open, onOpenChange, filters, onChange }: Props) {
           </SheetDescription>
         </SheetHeader>
         <div className="flex flex-col gap-5 px-4 py-6">
-          <div className="flex flex-col gap-2">
-            <Label>Department</Label>
-            <Select
-              value={filters.department}
-              onValueChange={(v) => onChange({ ...filters, department: v })}
-            >
-              <SelectTrigger className="rounded-xl">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All departments</SelectItem>
-                {DEPARTMENTS.map((d) => (
-                  <SelectItem key={d} value={d}>{d}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {user?.role === "admin" && (
+            <div className="flex flex-col gap-2">
+              <Label>Department</Label>
+              <Select
+                value={filters.department}
+                onValueChange={(v) => onChange({ ...filters, department: v })}
+              >
+                <SelectTrigger className="rounded-xl">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All departments</SelectItem>
+                  {DEPARTMENTS.map((d) => (
+                    <SelectItem key={d} value={d}>{d}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <div className="flex flex-col gap-2">
             <Label>Year</Label>
             <Select value={filters.year} onValueChange={(v) => onChange({ ...filters, year: v })}>

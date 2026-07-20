@@ -56,68 +56,7 @@ export function UserMenu() {
     if (e.key === "Enter") handleSignIn();
   };
 
-  if (!user) {
-    return (
-      <>
-        <Button
-          variant="default"
-          size="sm"
-          onClick={() => setSignInOpen(true)}
-          className="rounded-full"
-        >
-          <LogIn className="mr-2 h-4 w-4" />
-          Sign in
-        </Button>
-        <Dialog open={signInOpen} onOpenChange={setSignInOpen}>
-          <DialogContent className="rounded-3xl sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Sign in</DialogTitle>
-              <DialogDescription>
-                Students can browse the calendar without signing in. Faculty sign in below.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
-                <Label className="text-xs font-medium text-muted-foreground">Username</Label>
-                <Input
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="e.g. admin"
-                  className="rounded-xl"
-                  autoFocus
-                />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <Label className="text-xs font-medium text-muted-foreground">Password</Label>
-                <Input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="••••••••"
-                  className="rounded-xl"
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setSignInOpen(false)}
-                className="rounded-full"
-                disabled={busy}
-              >
-                Cancel
-              </Button>
-              <Button onClick={handleSignIn} className="rounded-full" disabled={busy}>
-                {busy ? "Signing in…" : "Continue"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </>
-    );
-  }
+  if (!user) return null;
 
   const initials = user.name
     .split(" ")

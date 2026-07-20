@@ -12,8 +12,12 @@ import { EventDetailsDialog } from "@/components/calendar/EventDetailsDialog";
 import { EventFormDialog } from "@/components/calendar/EventFormDialog";
 import { UserMenu } from "@/components/calendar/UserMenu";
 import { CalendarProvider, canCreate, canEditEvent, useCalendar } from "@/lib/calendar/store";
-import type { AcademicEvent } from "@/lib/calendar/types";
+import { type AcademicEvent, DEPARTMENTS } from "@/lib/calendar/types";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -48,8 +52,164 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <CalendarProvider>
-      <CalendarPage />
+      <RootController />
     </CalendarProvider>
+  );
+}
+
+function RootController() {
+  const { user } = useCalendar();
+  if (!user) return <LandingLogin />;
+  return <CalendarPage />;
+}
+
+function LandingLogin() {
+  const { login } = useCalendar();
+  const [busy, setBusy] = useState(false);
+
+  // Student state
+  const [department, setDepartment] = useState<string>("");
+  const [passkey, setPasskey] = useState("");
+
+  // Staff state
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleStudentLogin = async () => {
+    if (!department) {
+      toast.error("Please select your department");
+      return;
+    }
+    if (!passkey) {
+      toast.error("Please enter the passkey");
+      return;
+    }
+    setBusy(true);
+    try {
+      await login("student", passkey, department);
+      toast.success("Welcome to the Student Portal");
+    } catch (err: any) {
+      toast.error("Invalid passkey");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleStaffLogin = async () => {
+    if (!username || !password) {
+      toast.error("Please enter credentials");
+      return;
+    }
+    setBusy(true);
+    try {
+      await login(username, password);
+      toast.success("Signed in successfully");
+    } catch (err: any) {
+      toast.error("Invalid username or password");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-[#f8fafc] px-4">
+      <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-xl shadow-primary/5">
+        <div className="mb-8 text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+              <path d="M6 12v5c3 3 9 3 12 0v-5" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight">Academic Calendar</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Sign in to access schedules</p>
+        </div>
+
+        <Tabs defaultValue="student" className="w-full">
+          <TabsList className="mb-6 grid w-full grid-cols-2 rounded-full">
+            <TabsTrigger value="student" className="rounded-full">Student</TabsTrigger>
+            <TabsTrigger value="staff" className="rounded-full">Staff</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="student" className="space-y-4">
+            <div className="space-y-2">
+              <Label>Department</Label>
+              <Select value={department} onValueChange={setDepartment}>
+                <SelectTrigger className="rounded-xl">
+                  <SelectValue placeholder="Select your department" />
+                </SelectTrigger>
+                <SelectContent>
+                  {DEPARTMENTS.map((d) => (
+                    <SelectItem key={d} value={d}>{d}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Passkey</Label>
+              <Input
+                type="password"
+                placeholder="Enter student passkey"
+                value={passkey}
+                onChange={(e) => setPasskey(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleStudentLogin()}
+                className="rounded-xl"
+              />
+            </div>
+            <Button
+              className="w-full rounded-full"
+              size="lg"
+              onClick={handleStudentLogin}
+              disabled={busy}
+            >
+              {busy ? "Entering..." : "Enter Portal"}
+            </Button>
+          </TabsContent>
+
+          <TabsContent value="staff" className="space-y-4">
+            <div className="space-y-2">
+              <Label>Username</Label>
+              <Input
+                placeholder="Admin or HOD username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleStaffLogin()}
+                className="rounded-xl"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Password</Label>
+              <Input
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleStaffLogin()}
+                className="rounded-xl"
+              />
+            </div>
+            <Button
+              className="w-full rounded-full"
+              size="lg"
+              onClick={handleStaffLogin}
+              disabled={busy}
+            >
+              {busy ? "Signing in..." : "Sign In"}
+            </Button>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
   );
 }
 

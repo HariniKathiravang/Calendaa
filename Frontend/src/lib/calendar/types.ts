@@ -27,7 +27,7 @@ export const DEPARTMENTS = ["CSE", "ECE", "MECH", "CIVIL", "IT", "EEE"] as const
 export const YEARS = ["I", "II", "III", "IV"] as const;
 export const SECTIONS = ["A", "B", "C"] as const;
 
-export type Role = "admin" | "hod" | "guest";
+export type Role = "admin" | "hod" | "student" | "guest";
 
 export interface AuthUser {
   name: string;
