@@ -66,6 +66,10 @@ export async function apiLogin(username: string, password: string, department?: 
   });
 }
 
+export async function apiMe(): Promise<LoginResponse["user"]> {
+  return request<LoginResponse["user"]>("/auth/me");
+}
+
 // ── Events ───────────────────────────────────────────────────────────────────
 
 export interface ApiEvent {

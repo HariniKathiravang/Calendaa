@@ -7,17 +7,48 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
-import type { AcademicEvent, AuthUser, Filters } from "./types";
+import type { AcademicEvent, AuthUser, Filters, Role } from "./types";
 import {
   apiLogin,
   apiFetchEvents,
   apiCreateEvent,
   apiUpdateEvent,
   apiDeleteEvent,
+  apiMe,
   setToken,
   clearToken,
   getToken,
 } from "./api";
+
+const FILTERS_STORAGE_KEY = "calendaa_filters";
+const DEFAULT_FILTERS: Filters = {
+  department: "all",
+  year: "all",
+  section: "all",
+  search: "",
+};
+
+function loadSavedFilters(): Filters {
+  if (typeof window === "undefined") return DEFAULT_FILTERS;
+  try {
+    const raw = localStorage.getItem(FILTERS_STORAGE_KEY);
+    if (!raw) return DEFAULT_FILTERS;
+    const parsed = JSON.parse(raw) as Partial<Filters>;
+    return {
+      department: typeof parsed.department === "string" ? parsed.department : "all",
+      year: typeof parsed.year === "string" ? parsed.year : "all",
+      section: typeof parsed.section === "string" ? parsed.section : "all",
+      search: typeof parsed.search === "string" ? parsed.search : "",
+    };
+  } catch {
+    return DEFAULT_FILTERS;
+  }
+}
+
+function saveFilters(filters: Filters) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(filters));
+}
 
 interface CalendarStore {
   events: AcademicEvent[];
@@ -39,13 +70,41 @@ const CalendarCtx = createContext<CalendarStore | null>(null);
 export function CalendarProvider({ children }: { children: ReactNode }) {
   const [events, setEvents] = useState<AcademicEvent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState<Filters>({
-    department: "all",
-    year: "all",
-    section: "all",
-    search: "",
-  });
+  const [filters, setFilters] = useState<Filters>(() => loadSavedFilters());
   const [user, setUser] = useState<AuthUser | null>(null);
+
+  // Restore token-based login and persisted filters on startup
+  useEffect(() => {
+    const token = getToken();
+    if (!token) return;
+
+    let active = true;
+    (async () => {
+      try {
+        const me = await apiMe();
+        if (!active) return;
+        setUser({
+          name: me.name,
+          email: me.email,
+          role: me.role as Role,
+          department: me.department,
+        });
+        if (me.department) {
+          setFilters((prev) => ({ ...prev, department: me.department! }));
+        }
+      } catch (err) {
+        clearToken();
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    saveFilters(filters);
+  }, [filters]);
 
   // Fetch all events from the backend
   const refreshEvents = useCallback(async () => {
@@ -92,10 +151,10 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
       role: res.user.role as Role,
       department: res.user.department,
     });
-    
+
     // Auto-lock filters for students or HODs to their department
     if (res.user.department) {
-      setFilters(prev => ({ ...prev, department: res.user.department! }));
+      setFilters((prev) => ({ ...prev, department: res.user.department! }));
     }
   }, []);
 
