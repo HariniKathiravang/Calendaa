@@ -1,3 +1,6 @@
+import os
+import traceback
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -5,31 +8,22 @@ from app.database.session import engine
 from app.database.base import Base
 from app.config import settings, get_allowed_origins
 
-# Import all models so SQLAlchemy registers them
+# Register all models with SQLAlchemy before creating tables
 from app.models import Admin, HOD, Department, Year, Section, Event  # noqa: F401
-
 from app.routes import auth, events, admin, lookup
 
-# Create all tables (idempotent — uses IF NOT EXISTS internally)
+# Create tables (idempotent)
 Base.metadata.create_all(bind=engine)
 
-# Optionally run idempotent seed to ensure required lookup data exists.
-import os
-
-run_seed_flag = os.environ.get("RUN_SEED", "").lower()
-if run_seed_flag in ("1", "true", "yes"):
+# Run seed only when explicitly opted-in via RUN_SEED env var.
+# Set RUN_SEED=1 on first deploy or to refresh lookup data.
+if os.environ.get("RUN_SEED", "").lower() in ("1", "true", "yes"):
     try:
         from app.seed import seed_all
-
-        print("[INFO] RUN_SEED enabled — running idempotent seed")
+        print("[INFO] RUN_SEED=1 — running idempotent seed")
         seed_all()
     except Exception:
-        # Don't break startup if seeding fails — log for debugging
-        import traceback
-
-        print("[WARN] Seeding on startup failed:\n", traceback.format_exc())
-else:
-    print("[INFO] RUN_SEED not enabled — skipping automatic seeding on startup")
+        print("[WARN] Seeding failed:\n", traceback.format_exc())
 
 app = FastAPI(
     title="Calendaa API",
@@ -55,4 +49,9 @@ app.include_router(lookup.router)
 
 @app.get("/", tags=["Health"])
 def health():
-    return {"status": "ok", "service": "Calendaa API", "version": "1.0.0"}
+    return {
+        "status": "ok",
+        "service": "Calendaa API",
+        "version": "1.0.0",
+        "db": settings.DATABASE_URL[:40] + "...",
+    }
