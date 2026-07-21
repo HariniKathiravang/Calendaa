@@ -55,7 +55,7 @@ def seed_admin():
 
 def seed_departments():
     depts = {}
-    for name in ["CSE", "AIML", "ECE"]:
+    for name in ["CSE", "AIML", "ECE","AIDS","EEE","RA","CSD","MECH","CIVIL","CSBS","BME","IT","MBA","MCA","CYBER"]:
         dept = Department(name=name)
         db.add(dept)
         db.flush()
@@ -131,13 +131,7 @@ def seed_events(sections):
         dict(title="Hackathon 2026 – Ideation Round", description="24-hour hackathon kick-off. Teams pitch problem statements to mentors.", date=d(7), startTime="09:00", endTime="18:00", venue="Innovation Hub", dept="CSE", year="III", section="A", category="event"),
         dict(title="Semester End Exam – Operating Systems", description="Final exam covering scheduling, memory management and file systems.", date=d(8), startTime="09:30", endTime="12:30", venue="Central Exam Hall", dept="CSE", year="II", section="A", category="exam"),
         dict(title="Guest Lecture: Cloud Architecture", description="Industry expert from AWS on designing scalable cloud-native systems.", date=d(10), startTime="14:00", endTime="16:00", venue="Auditorium 1", dept="CSE", year="IV", section="A", category="workshop"),
-        dict(title="Final Year Project Review – Phase I", description="Capstone project progress evaluation by faculty review panel.", date=d(12), startTime="10:00", endTime="16:00", venue="Seminar Hall 1", dept="CSE", year="IV", section="B", category="event"),
-        dict(title="Placement Training – Aptitude", description="Quantitative aptitude and logical reasoning session by T&P cell.", date=d(14), startTime="09:00", endTime="11:00", venue="Placement Hall", dept="CSE", year="IV", section="A", category="meeting"),
-        dict(title="Machine Learning Fundamentals", description="Supervised learning: linear regression and gradient descent derivation.", date=d(16), startTime="11:00", endTime="12:30", venue="Room 301, Block B", dept="CSE", year="III", section="B", category="lecture"),
-        dict(title="Web Technologies Lab", description="Building RESTful APIs with Node.js and Express. Practical session.", date=d(18), startTime="14:00", endTime="17:00", venue="Web Lab, Block D", dept="CSE", year="III", section="A", category="lecture"),
-        dict(title="Internal Assessment II – CN", description="Computer Networks mid-term: TCP/IP stack, routing protocols.", date=d(20), startTime="10:00", endTime="13:00", venue="Exam Hall B", dept="CSE", year="III", section="B", category="exam"),
-        dict(title="TechFest – Main Event", description="Annual technology festival: paper presentations, coding contests, robotics.", date=d(22), startTime="08:00", endTime="18:00", venue="Main Campus Grounds", dept="CSE", year="III", section="A", category="event"),
-
+        
         # ── AIML ─────────────────────────────────────────────────────────────
         dict(title="Deep Learning with PyTorch", description="CNN architectures: AlexNet, VGG, ResNet — hands-on session.", date=d(2), startTime="10:00", endTime="12:00", venue="AI Lab 1, Block E", dept="AIML", year="III", section="A", category="lecture"),
         dict(title="Internal Assessment I – Python", description="Programming test covering NumPy, Pandas, and Matplotlib.", date=d(5), startTime="09:00", endTime="12:00", venue="CS Lab 2", dept="AIML", year="I", section="A", category="exam"),
