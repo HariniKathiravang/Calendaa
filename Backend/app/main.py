@@ -13,16 +13,23 @@ from app.routes import auth, events, admin, lookup
 # Create all tables (idempotent — uses IF NOT EXISTS internally)
 Base.metadata.create_all(bind=engine)
 
-# Run idempotent seed to ensure required lookup data exists.
-try:
-    from app.seed import seed_all
+# Optionally run idempotent seed to ensure required lookup data exists.
+import os
 
-    seed_all()
-except Exception:
-    # Don't break startup if seeding fails — log for debugging
-    import traceback
+run_seed_flag = os.environ.get("RUN_SEED", "").lower()
+if run_seed_flag in ("1", "true", "yes"):
+    try:
+        from app.seed import seed_all
 
-    print("[WARN] Seeding on startup failed:\n", traceback.format_exc())
+        print("[INFO] RUN_SEED enabled — running idempotent seed")
+        seed_all()
+    except Exception:
+        # Don't break startup if seeding fails — log for debugging
+        import traceback
+
+        print("[WARN] Seeding on startup failed:\n", traceback.format_exc())
+else:
+    print("[INFO] RUN_SEED not enabled — skipping automatic seeding on startup")
 
 app = FastAPI(
     title="Calendaa API",

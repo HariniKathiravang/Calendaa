@@ -157,11 +157,11 @@ def seed_all():
     db = SessionLocal()
     try:
         # Admin (from external config if present)
-            admin_cfg = (EXTERNAL_SEED_CONFIG.get("admin") if EXTERNAL_SEED_CONFIG else None)
-            if admin_cfg:
-                upsert_admin(db, username=admin_cfg.get("username", "admin"), password=admin_cfg.get("password", "1234"), name=admin_cfg.get("name", "Admin User"), email=admin_cfg.get("email", "admin@calendaa.edu"))
-            else:
-                upsert_admin(db, username="admin", password="1234", name="Admin User", email="admin@calendaa.edu")
+        admin_cfg = (EXTERNAL_SEED_CONFIG.get("admin") if EXTERNAL_SEED_CONFIG else None)
+        if admin_cfg:
+            upsert_admin(db, username=admin_cfg.get("username", "admin"), password=admin_cfg.get("password", "1234"), name=admin_cfg.get("name", "Admin User"), email=admin_cfg.get("email", "admin@calendaa.edu"))
+        else:
+            upsert_admin(db, username="admin", password="1234", name="Admin User", email="admin@calendaa.edu")
 
         # Departments + years + sections
         depts = {}
