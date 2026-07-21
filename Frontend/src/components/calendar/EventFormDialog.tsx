@@ -300,30 +300,6 @@ export function EventFormDialog({ open, onOpenChange, initial, defaultDate }: Pr
             <div className="h-px flex-1 bg-border" />
           </div>
 
-          {/* Manual create (secondary) */}
-          <button
-            type="button"
-            onClick={() => setAdminStep("review")}
-            className="flex w-full items-center justify-between rounded-2xl border border-border bg-background px-5 py-4 text-left transition-all hover:border-primary/40 hover:bg-muted/40 hover:shadow-sm"
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-muted">
-                <FileText className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold">Paste LLM JSON</p>
-                <p className="text-xs text-muted-foreground">Paste the JSON output from your LLM</p>
-              </div>
-            </div>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </button>
-
-          <div className="flex items-center gap-3">
-            <div className="h-px flex-1 bg-border" />
-            <span className="text-xs font-medium text-muted-foreground">OR</span>
-            <div className="h-px flex-1 bg-border" />
-          </div>
-
           <button
             type="button"
             onClick={() => setManualMode(true)}

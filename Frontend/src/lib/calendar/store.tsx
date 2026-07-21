@@ -134,8 +134,17 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
   // Fetch departments from the backend on mount (replaces hardcoded list in types.ts)
   useEffect(() => {
     apiFetchDepartments()
-      .then((data) => setDepartments(data.map((d) => d.name)))
-      .catch(() => {/* silently fall back to empty — UI shows nothing selected */});
+      .then((data) => {
+        if (data && data.length > 0) {
+          setDepartments(data.map((d) => d.name));
+        } else {
+          setDepartments(["CSE", "AIML", "ECE", "AIDS", "EEE", "RA", "CSD", "MECH", "CIVIL", "CSBS", "BME", "IT", "MBA", "MCA", "CYBER"]);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch departments, using fallback", err);
+        setDepartments(["CSE", "AIML", "ECE", "AIDS", "EEE", "RA", "CSD", "MECH", "CIVIL", "CSBS", "BME", "IT", "MBA", "MCA", "CYBER"]);
+      });
   }, []);
 
   // Fetch all events from the backend
