@@ -10,7 +10,7 @@ pytesseract.pytesseract.tesseract_cmd = (
 )
 
 # PDF path
-pdf_path = "Circular - Deepavali.pdf"
+pdf_path = "Calendar - 2026-2027.pdf"
 
 # Convert PDF -> Images
 pages = convert_from_path(

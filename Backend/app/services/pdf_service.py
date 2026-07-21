@@ -1,0 +1,45 @@
+import io
+from pdf2image import convert_from_bytes
+import pytesseract
+import cv2
+import numpy as np
+from app.config import settings
+
+# Configure Tesseract path
+pytesseract.pytesseract.tesseract_cmd = settings.TESSERACT_CMD
+
+def extract_text_from_pdf_bytes(pdf_bytes: bytes) -> str:
+    """
+    Convert a PDF file (provided as bytes) into images, process them,
+    and extract text using OCR.
+    """
+    # Convert PDF -> Images
+    pages = convert_from_bytes(
+        pdf_bytes,
+        poppler_path=settings.POPPLER_PATH
+    )
+
+    full_text = ""
+    for page in pages:
+        # Convert PIL Image to OpenCV format
+        img = np.array(page)
+        
+        # Check if image has RGB channels before converting to grayscale
+        if len(img.shape) == 3 and img.shape[2] == 3:
+            gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+        else:
+            gray = img
+            
+        # Apply thresholding
+        _, thresh = cv2.threshold(
+            gray,
+            0,
+            255,
+            cv2.THRESH_BINARY + cv2.THRESH_OTSU
+        )
+        
+        # Extract text
+        text = pytesseract.image_to_string(thresh)
+        full_text += text + "\n\n"
+        
+    return full_text

@@ -77,6 +77,31 @@ export async function apiBulkImportEvents(events: Omit<ApiEvent, "id">[]): Promi
   });
 }
 
+export async function apiExtractEventsFromPdf(file: File): Promise<Omit<ApiEvent, "id">[]> {
+  const token = getToken();
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const safePath = "/events/extract-from-pdf";
+  const res = await fetch(`${BASE_URL}${safePath}`, {
+    method: "POST",
+    headers,
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(body?.detail ?? `HTTP ${res.status}`);
+  }
+
+  return res.json() as Promise<Omit<ApiEvent, "id">[]>;
+}
+
 // ── Events ───────────────────────────────────────────────────────────────────
 
 export interface ApiEvent {

@@ -1,4 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File
+import json
+import ollama
+from app.services.pdf_service import extract_text_from_pdf_bytes
 from sqlalchemy.orm import Session
 from app.database.session import get_db
 from app.schemas.event import EventCreate, EventUpdate, EventOut
@@ -66,3 +69,67 @@ def delete_event(
     if not deleted:
         raise HTTPException(status_code=404, detail="Event not found")
 
+@router.post("/extract-from-pdf", response_model=list[EventCreate])
+async def extract_events_from_pdf(
+    file: UploadFile = File(...),
+    payload: dict = Depends(require_admin),
+):
+    """Admin only — extract text from PDF and generate events using LLM. Does NOT save to DB."""
+    if not file.filename.lower().endswith('.pdf'):
+        raise HTTPException(status_code=400, detail="Only PDF files are supported.")
+        
+    pdf_bytes = await file.read()
+    try:
+        raw_text = extract_text_from_pdf_bytes(pdf_bytes)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to extract text from PDF: {str(e)}")
+        
+    prompt = f"""
+You are an AI document parser.
+
+Your task is to convert OCR extracted text from an academic circular or schedule
+into a clean structured JSON array of events.
+
+IMPORTANT RULES:
+1. Return ONLY valid JSON array containing event objects.
+2. Do not add explanations.
+3. Do not add markdown or ```json wrappers.
+4. If a field is missing or unknown, provide a sensible default (e.g. empty string or "all" for department).
+5. The output MUST be a JSON array `[...]` where each item matches the EXPECTED FORMAT exactly.
+
+EXPECTED EVENT FORMAT (JSON Object):
+{{
+    "title": "String (concise name of the event)",
+    "description": "String (brief summary, prerequisites, or key details)",
+    "date": "String (YYYY-MM-DD)",
+    "startTime": "String (HH:mm, 24-hour format, use 09:00 if unknown)",
+    "endTime": "String (HH:mm, 24-hour format, use 17:00 if unknown)",
+    "venue": "String (Location, room, or link)",
+    "department": "String (The department it applies to, e.g. CSE, IT, or 'all')",
+    "year": "String (e.g. '1', '2', '3', '4', or 'all')",
+    "section": "String (e.g. 'A', 'B', or 'all')",
+    "category": "String (Must be one of: lecture, exam, event, holiday, meeting, workshop)"
+}}
+
+OCR TEXT:
+{raw_text}
+"""
+    try:
+        response = ollama.chat(
+            model="gpt-oss:120b-cloud",
+            messages=[{"role": "user", "content": prompt}]
+        )
+        
+        result = response["message"]["content"]
+        result = result.replace("```json", "").replace("```", "").strip()
+        
+        parsed_events = json.loads(result)
+        if not isinstance(parsed_events, list):
+            parsed_events = [parsed_events]
+            
+        return parsed_events
+        
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=500, detail="Invalid JSON returned by LLM.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"LLM processing failed: {str(e)}")

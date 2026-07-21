@@ -10,8 +10,10 @@ import { DayView } from "@/components/calendar/DayView";
 import { FilterDrawer } from "@/components/calendar/FilterDrawer";
 import { EventDetailsDialog } from "@/components/calendar/EventDetailsDialog";
 import { EventFormDialog } from "@/components/calendar/EventFormDialog";
+import { ImportEventsDialog } from "@/components/calendar/ImportEventsDialog";
 import { UserMenu } from "@/components/calendar/UserMenu";
 import { CalendarProvider, canCreate, canEditEvent, useCalendar } from "@/lib/calendar/store";
+import { FileText } from "lucide-react";
 import { type AcademicEvent } from "@/lib/calendar/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -222,6 +224,8 @@ function CalendarPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<AcademicEvent | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<AcademicEvent | null>(null);
+  const [importOpen, setImportOpen] = useState(false);
+
 
   const handlePrev = () => {
     if (view === "month") setCurrentDate((d) => addMonths(d, -1));
@@ -348,15 +352,27 @@ function CalendarPage() {
       </main>
 
       {canCreate(user) && (
-        <Button
-          onClick={openNew}
-          className="fixed bottom-6 right-6 z-40 h-14 rounded-full px-6 shadow-lg shadow-primary/25 transition-transform hover:scale-105"
-          size="lg"
-        >
-          <Plus className="mr-2 h-5 w-5" />
-          Add event
-        </Button>
+        <div className="fixed bottom-6 right-6 z-40 flex flex-col gap-3">
+          <Button
+            onClick={() => setImportOpen(true)}
+            className="h-12 rounded-full px-5 shadow-lg shadow-primary/25 transition-transform hover:scale-105"
+            variant="secondary"
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            Import from PDF
+          </Button>
+          <Button
+            onClick={openNew}
+            className="h-14 rounded-full px-6 shadow-lg shadow-primary/25 transition-transform hover:scale-105"
+            size="lg"
+          >
+            <Plus className="mr-2 h-5 w-5" />
+            Add event
+          </Button>
+        </div>
       )}
+
+      <ImportEventsDialog open={importOpen} onOpenChange={setImportOpen} />
 
       <FilterDrawer
         open={filterOpen}

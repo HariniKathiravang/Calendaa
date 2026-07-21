@@ -7,6 +7,10 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours
 
+    # Paths for PDF parsing
+    TESSERACT_CMD: str = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+    POPPLER_PATH: str = r"C:\Program Files\poppler\Library\bin"
+
     # Comma-separated list of allowed CORS origins.
     # Local defaults cover all common Vite/dev server ports.
     # In production (Vercel), set this to your deployed frontend URL.

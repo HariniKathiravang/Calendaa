@@ -16,7 +16,9 @@ import {
   apiDeleteEvent,
   apiMe,
   apiBulkImportEvents,
+  apiExtractEventsFromPdf,
   apiFetchDepartments,
+
   setToken,
   clearToken,
   getToken,
@@ -61,7 +63,9 @@ interface CalendarStore {
   updateEvent: (e: AcademicEvent) => Promise<void>;
   deleteEvent: (id: string) => Promise<void>;
   bulkImportEvents: (events: Omit<ApiEvent, "id">[]) => Promise<void>;
+  extractEventsFromPdf: (file: File) => Promise<Omit<ApiEvent, "id">[]>;
   filters: Filters;
+
   setFilters: (f: Filters) => void;
   user: AuthUser | null;
   login: (username: string, password: string, department?: string) => Promise<void>;
@@ -232,7 +236,12 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
     await refreshEvents();
   }, [refreshEvents]);
 
+  const extractEventsFromPdf = useCallback(async (file: File) => {
+    return await apiExtractEventsFromPdf(file);
+  }, []);
+
   const value: CalendarStore = {
+
     events,
     loading,
     departments,
@@ -246,8 +255,10 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
     updateEvent,
     deleteEvent,
     bulkImportEvents,
+    extractEventsFromPdf,
     refreshEvents,
   };
+
 
   return <CalendarCtx.Provider value={value}>{children}</CalendarCtx.Provider>;
 }
