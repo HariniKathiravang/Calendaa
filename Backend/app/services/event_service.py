@@ -176,3 +176,33 @@ def delete_event(db: Session, event_id: int, user_payload: dict) -> bool:
     db.delete(event)
     db.commit()
     return True
+
+
+def bulk_create_events(db: Session, data_list: list[EventCreate], user_payload: dict) -> list[EventOut]:
+    """Create multiple events in a single transaction. Admin only (enforced at route level)."""
+    created = []
+    for data in data_list:
+        section_id = _resolve_section_id(db, data.department, data.year, data.section)
+        if section_id is None:
+            section_id = _get_or_create_section(db, data.department, data.year, data.section)
+
+        event = Event(
+            title=data.title,
+            description=data.description,
+            date=data.date,
+            start_time=data.startTime,
+            end_time=data.endTime,
+            venue=data.venue,
+            category=data.category,
+            department=data.department,
+            year=data.year,
+            section_name=data.section,
+            section_id=section_id,
+        )
+        db.add(event)
+        created.append(event)
+
+    db.commit()
+    for ev in created:
+        db.refresh(ev)
+    return [_row_to_out(ev) for ev in created]

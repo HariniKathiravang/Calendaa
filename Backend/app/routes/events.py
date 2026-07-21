@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.database.session import get_db
 from app.schemas.event import EventCreate, EventUpdate, EventOut
 from app.services import event_service
-from app.auth.dependencies import require_admin_or_hod, get_optional_user
+from app.auth.dependencies import require_admin_or_hod, require_admin, get_optional_user
 from typing import Optional
 
 router = APIRouter(prefix="/events", tags=["Events"])
@@ -31,6 +31,18 @@ def create_event(
     return event_service.create_event(db, body, payload)
 
 
+@router.post("/bulk", response_model=list[EventOut], status_code=status.HTTP_201_CREATED)
+def bulk_create_events(
+    body: list[EventCreate],
+    db: Session = Depends(get_db),
+    payload: dict = Depends(require_admin),
+):
+    """Admin only — bulk import events from LLM JSON output."""
+    if not body:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Event list is empty")
+    return event_service.bulk_create_events(db, body, payload)
+
+
 @router.put("/{event_id}", response_model=EventOut)
 def update_event(
     event_id: int,
@@ -53,3 +65,4 @@ def delete_event(
     deleted = event_service.delete_event(db, event_id, payload)
     if not deleted:
         raise HTTPException(status_code=404, detail="Event not found")
+

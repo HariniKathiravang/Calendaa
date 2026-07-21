@@ -70,6 +70,13 @@ export async function apiMe(): Promise<LoginResponse["user"]> {
   return request<LoginResponse["user"]>("/auth/me");
 }
 
+export async function apiBulkImportEvents(events: Omit<ApiEvent, "id">[]): Promise<ApiEvent[]> {
+  return request<ApiEvent[]>("/events/bulk", {
+    method: "POST",
+    body: JSON.stringify(events),
+  });
+}
+
 // ── Events ───────────────────────────────────────────────────────────────────
 
 export interface ApiEvent {

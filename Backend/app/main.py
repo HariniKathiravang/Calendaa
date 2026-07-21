@@ -13,6 +13,17 @@ from app.routes import auth, events, admin, lookup
 # Create all tables (idempotent — uses IF NOT EXISTS internally)
 Base.metadata.create_all(bind=engine)
 
+# Run idempotent seed to ensure required lookup data exists.
+try:
+    from app.seed import seed_all
+
+    seed_all()
+except Exception:
+    # Don't break startup if seeding fails — log for debugging
+    import traceback
+
+    print("[WARN] Seeding on startup failed:\n", traceback.format_exc())
+
 app = FastAPI(
     title="Calendaa API",
     description="Academic Calendar backend — events, departments, HOD management",

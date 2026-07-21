@@ -15,9 +15,11 @@ import {
   apiUpdateEvent,
   apiDeleteEvent,
   apiMe,
+  apiBulkImportEvents,
   setToken,
   clearToken,
   getToken,
+  type ApiEvent,
 } from "./api";
 
 const FILTERS_STORAGE_KEY = "calendaa_filters";
@@ -56,6 +58,7 @@ interface CalendarStore {
   addEvent: (e: Omit<AcademicEvent, "id">) => Promise<void>;
   updateEvent: (e: AcademicEvent) => Promise<void>;
   deleteEvent: (id: string) => Promise<void>;
+  bulkImportEvents: (events: Omit<ApiEvent, "id">[]) => Promise<void>;
   filters: Filters;
   setFilters: (f: Filters) => void;
   user: AuthUser | null;
@@ -205,6 +208,11 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
     setEvents((prev) => prev.filter((p) => p.id !== id));
   }, []);
 
+  const bulkImportEvents = useCallback(async (events: Omit<ApiEvent, "id">[]) => {
+    await apiBulkImportEvents(events);
+    await refreshEvents();
+  }, [refreshEvents]);
+
   const value: CalendarStore = {
     events,
     loading,
@@ -217,6 +225,7 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
     addEvent,
     updateEvent,
     deleteEvent,
+    bulkImportEvents,
     refreshEvents,
   };
 
