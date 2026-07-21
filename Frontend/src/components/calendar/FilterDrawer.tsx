@@ -2,7 +2,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFo
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { DEPARTMENTS, YEARS, SECTIONS, type Filters } from "@/lib/calendar/types";
+import { YEARS, SECTIONS, type Filters } from "@/lib/calendar/types";
 import { useCalendar } from "@/lib/calendar/store";
 
 interface Props {
@@ -13,7 +13,7 @@ interface Props {
 }
 
 export function FilterDrawer({ open, onOpenChange, filters, onChange }: Props) {
-  const { user } = useCalendar();
+  const { user, departments } = useCalendar();
 
   const reset = () =>
     onChange({ 
@@ -45,7 +45,7 @@ export function FilterDrawer({ open, onOpenChange, filters, onChange }: Props) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All departments</SelectItem>
-                  {DEPARTMENTS.map((d) => (
+                  {departments.map((d) => (
                     <SelectItem key={d} value={d}>{d}</SelectItem>
                   ))}
                 </SelectContent>

@@ -12,7 +12,7 @@ import { EventDetailsDialog } from "@/components/calendar/EventDetailsDialog";
 import { EventFormDialog } from "@/components/calendar/EventFormDialog";
 import { UserMenu } from "@/components/calendar/UserMenu";
 import { CalendarProvider, canCreate, canEditEvent, useCalendar } from "@/lib/calendar/store";
-import { type AcademicEvent, DEPARTMENTS } from "@/lib/calendar/types";
+import { type AcademicEvent } from "@/lib/calendar/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -64,7 +64,7 @@ function RootController() {
 }
 
 function LandingLogin() {
-  const { login } = useCalendar();
+  const { login, departments } = useCalendar();
   const [busy, setBusy] = useState(false);
 
   // Student state
@@ -149,7 +149,7 @@ function LandingLogin() {
                   <SelectValue placeholder="Select your department" />
                 </SelectTrigger>
                 <SelectContent>
-                  {DEPARTMENTS.map((d) => (
+                  {departments.map((d) => (
                     <SelectItem key={d} value={d}>{d}</SelectItem>
                   ))}
                 </SelectContent>

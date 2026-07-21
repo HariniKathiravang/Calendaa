@@ -23,7 +23,6 @@ export interface AcademicEvent {
   category: EventCategory;
 }
 
-export const DEPARTMENTS = ["CSE", "ECE", "MECH", "CIVIL", "IT", "EEE"] as const;
 export const YEARS = ["I", "II", "III", "IV"] as const;
 export const SECTIONS = ["A", "B", "C"] as const;
 

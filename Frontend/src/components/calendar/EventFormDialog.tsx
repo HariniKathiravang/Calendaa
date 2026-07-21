@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/select";
 import {
   CATEGORY_META,
-  DEPARTMENTS,
   SECTIONS,
   YEARS,
   type AcademicEvent,
@@ -510,6 +509,7 @@ function ManualForm({
   setDraft: (d: Omit<AcademicEvent, "id">) => void;
   isHod: boolean;
 }) {
+  const { departments } = useCalendar();
   return (
     <div className="flex flex-col gap-4">
       <Field label="Title">
@@ -587,7 +587,7 @@ function ManualForm({
           >
             <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
             <SelectContent>
-              {DEPARTMENTS.map((d) => (
+              {departments.map((d) => (
                 <SelectItem key={d} value={d}>{d}</SelectItem>
               ))}
             </SelectContent>

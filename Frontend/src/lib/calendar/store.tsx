@@ -16,6 +16,7 @@ import {
   apiDeleteEvent,
   apiMe,
   apiBulkImportEvents,
+  apiFetchDepartments,
   setToken,
   clearToken,
   getToken,
@@ -55,6 +56,7 @@ function saveFilters(filters: Filters) {
 interface CalendarStore {
   events: AcademicEvent[];
   loading: boolean;
+  departments: string[];
   addEvent: (e: Omit<AcademicEvent, "id">) => Promise<void>;
   updateEvent: (e: AcademicEvent) => Promise<void>;
   deleteEvent: (id: string) => Promise<void>;
@@ -73,6 +75,7 @@ const CalendarCtx = createContext<CalendarStore | null>(null);
 export function CalendarProvider({ children }: { children: ReactNode }) {
   const [events, setEvents] = useState<AcademicEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [departments, setDepartments] = useState<string[]>([]);
   const [filters, setFilters] = useState<Filters>(() => loadSavedFilters());
   const [user, setUser] = useState<AuthUser | null>(() => {
     if (typeof window === "undefined") return null;
@@ -127,6 +130,13 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     saveFilters(filters);
   }, [filters]);
+
+  // Fetch departments from the backend on mount (replaces hardcoded list in types.ts)
+  useEffect(() => {
+    apiFetchDepartments()
+      .then((data) => setDepartments(data.map((d) => d.name)))
+      .catch(() => {/* silently fall back to empty — UI shows nothing selected */});
+  }, []);
 
   // Fetch all events from the backend
   const refreshEvents = useCallback(async () => {
@@ -216,6 +226,7 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
   const value: CalendarStore = {
     events,
     loading,
+    departments,
     filters,
     setFilters,
     user,
