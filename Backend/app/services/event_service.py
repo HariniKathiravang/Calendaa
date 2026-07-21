@@ -47,11 +47,11 @@ def list_events(
 ) -> list[EventOut]:
     q = db.query(Event)
     if department and department != "all":
-        q = q.filter(Event.department == department)
+        q = q.filter(or_(Event.department == department, Event.department == "all", Event.department == "All"))
     if year and year != "all":
-        q = q.filter(Event.year == year)
+        q = q.filter(or_(Event.year == year, Event.year == "all", Event.year == "All"))
     if section and section != "all":
-        q = q.filter(Event.section_name == section)
+        q = q.filter(or_(Event.section_name == section, Event.section_name == "all", Event.section_name == "All"))
     if month:
         q = q.filter(Event.date.startswith(month))
     if search:
@@ -76,11 +76,13 @@ def create_event(db: Session, data: EventCreate, user_payload: dict) -> EventOut
                 detail="HODs can only create events for their own department",
             )
 
-    section_id = _resolve_section_id(db, data.department, data.year, data.section)
-    if section_id is None:
-        # Create department/year/section on the fly if they don't exist
-        # (fallback: use section_id=1 if none found — shouldn't happen after seeding)
-        section_id = _get_or_create_section(db, data.department, data.year, data.section)
+    section_id = None
+    if data.department.lower() != "all" and data.year.lower() != "all" and data.section.lower() != "all":
+        section_id = _resolve_section_id(db, data.department, data.year, data.section)
+        if section_id is None:
+            # Create department/year/section on the fly if they don't exist
+            # (fallback: use section_id=1 if none found — shouldn't happen after seeding)
+            section_id = _get_or_create_section(db, data.department, data.year, data.section)
 
     event = Event(
         title=data.title,

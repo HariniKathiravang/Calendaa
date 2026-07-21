@@ -167,9 +167,9 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
 
   const filteredEvents = useMemo(() => {
     return events.filter((e) => {
-      if (filters.department !== "all" && e.department !== filters.department) return false;
-      if (filters.year !== "all" && e.year !== filters.year) return false;
-      if (filters.section !== "all" && e.section !== filters.section) return false;
+      if (filters.department !== "all" && e.department !== filters.department && e.department !== "all" && e.department !== "All") return false;
+      if (filters.year !== "all" && e.year !== filters.year && e.year !== "all" && e.year !== "All") return false;
+      if (filters.section !== "all" && e.section !== filters.section && e.section !== "all" && e.section !== "All") return false;
       if (filters.search.trim()) {
         const q = filters.search.toLowerCase();
         if (
@@ -210,22 +210,22 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
 
   const addEvent = useCallback(
     async (e: Omit<AcademicEvent, "id">) => {
-      const created = await apiCreateEvent(e);
-      setEvents((prev) => [...prev, created as AcademicEvent]);
+      await apiCreateEvent(e);
+      await refreshEvents();
     },
-    [],
+    [refreshEvents],
   );
 
   const updateEvent = useCallback(async (e: AcademicEvent) => {
     const { id, ...rest } = e;
-    const updated = await apiUpdateEvent(id, rest);
-    setEvents((prev) => prev.map((p) => (p.id === id ? (updated as AcademicEvent) : p)));
-  }, []);
+    await apiUpdateEvent(id, rest);
+    await refreshEvents();
+  }, [refreshEvents]);
 
   const deleteEvent = useCallback(async (id: string) => {
     await apiDeleteEvent(id);
-    setEvents((prev) => prev.filter((p) => p.id !== id));
-  }, []);
+    await refreshEvents();
+  }, [refreshEvents]);
 
   const bulkImportEvents = useCallback(async (events: Omit<ApiEvent, "id">[]) => {
     await apiBulkImportEvents(events);

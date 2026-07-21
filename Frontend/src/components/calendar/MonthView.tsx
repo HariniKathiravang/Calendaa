@@ -42,7 +42,7 @@ export function MonthView({ currentDate, events, onEventClick, onDayClick }: Pro
       </div>
       <div className="grid grid-cols-7 auto-rows-fr">
         {days.map((day) => {
-          const dayEvents = events.filter((e) => isSameDay(new Date(e.date), day));
+          const dayEvents = events.filter((e) => isSameDay(new Date(e.date + "T00:00:00"), day));
           const inMonth = isSameMonth(day, currentDate);
           const isToday = isSameDay(day, today);
           return (

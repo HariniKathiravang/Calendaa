@@ -558,11 +558,18 @@ function ManualForm({
         <Field label="Department">
           <Select
             value={draft.department}
-            onValueChange={(v) => setDraft({ ...draft, department: v })}
+            onValueChange={(v) => {
+              if (v === "All" || v === "all") {
+                setDraft({ ...draft, department: v, year: "All", section: "All" });
+              } else {
+                setDraft({ ...draft, department: v });
+              }
+            }}
             disabled={isHod}
           >
             <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
             <SelectContent>
+              <SelectItem value="All">All departments</SelectItem>
               {departments.map((d) => (
                 <SelectItem key={d} value={d}>{d}</SelectItem>
               ))}
@@ -570,9 +577,20 @@ function ManualForm({
           </Select>
         </Field>
         <Field label="Year">
-          <Select value={draft.year} onValueChange={(v) => setDraft({ ...draft, year: v })}>
+          <Select 
+            value={draft.year} 
+            onValueChange={(v) => {
+              if (v === "All" || v === "all") {
+                setDraft({ ...draft, year: v, section: "All" });
+              } else {
+                setDraft({ ...draft, year: v });
+              }
+            }}
+            disabled={draft.department.toLowerCase() === "all"}
+          >
             <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
             <SelectContent>
+              <SelectItem value="All">All years</SelectItem>
               {YEARS.map((y) => (
                 <SelectItem key={y} value={y}>{y}</SelectItem>
               ))}
@@ -580,9 +598,14 @@ function ManualForm({
           </Select>
         </Field>
         <Field label="Section">
-          <Select value={draft.section} onValueChange={(v) => setDraft({ ...draft, section: v })}>
+          <Select 
+            value={draft.section} 
+            onValueChange={(v) => setDraft({ ...draft, section: v })}
+            disabled={draft.department.toLowerCase() === "all" || draft.year.toLowerCase() === "all"}
+          >
             <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
             <SelectContent>
+              <SelectItem value="All">All sections</SelectItem>
               {SECTIONS.map((s) => (
                 <SelectItem key={s} value={s}>{s}</SelectItem>
               ))}

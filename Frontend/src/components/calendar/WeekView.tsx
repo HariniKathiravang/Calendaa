@@ -27,7 +27,7 @@ export function WeekView({ currentDate, events, onEventClick, onDayClick }: Prop
       {days.map((day) => {
         const isToday = isSameDay(day, today);
         const dayEvents = events
-          .filter((e) => isSameDay(new Date(e.date), day))
+          .filter((e) => isSameDay(new Date(e.date + "T00:00:00"), day))
           .sort((a, b) => a.startTime.localeCompare(b.startTime));
 
         return (

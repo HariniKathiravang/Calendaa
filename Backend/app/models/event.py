@@ -20,8 +20,8 @@ class Event(Base):
     year = Column(String(10), nullable=False)
     section_name = Column(String(10), nullable=False)
 
-    # FK to Section for structural integrity
-    section_id = Column(Integer, ForeignKey("sections.id"), nullable=False)
+    # FK to Section for structural integrity (nullable for cross-department events)
+    section_id = Column(Integer, ForeignKey("sections.id"), nullable=True)
 
     # Relationship
     section = relationship("Section", back_populates="events")
