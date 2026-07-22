@@ -51,14 +51,17 @@ type Draft = Omit<AcademicEvent, "id">;
 const empty = (date: Date): Draft => ({
   title: "",
   description: "",
-  date: format(date, "yyyy-MM-dd"),
-  startTime: "09:00",
-  endTime: "10:00",
+  startDate: format(date, "yyyy-MM-dd"),
+  endDate: "",
+  startTime: "",
+  endTime: "",
   venue: "",
   department: "CSE",
   year: "I",
+  semester: "",
   section: "A",
   category: "lecture",
+  isLlm: false,
 });
 
 // ── Admin: step type ───────────────────────────────────────────────────────
@@ -160,7 +163,7 @@ export function EventFormDialog({ open, onOpenChange, initial, defaultDate }: Pr
           setParseError(`Item ${i + 1} is not an object.`);
           return;
         }
-        for (const field of ["title", "date", "startTime", "endTime", "department", "year", "section"]) {
+        for (const field of ["title", "startDate", "department", "year", "section"]) {
           if (!ev[field]) {
             setParseError(`Item ${i + 1} is missing required field: "${field}".`);
             return;
@@ -432,11 +435,13 @@ export function EventFormDialog({ open, onOpenChange, initial, defaultDate }: Pr
                 <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                   <p className="text-sm font-semibold">{ev.title}</p>
                   <p className="text-xs opacity-75">
-                    {ev.date} · {ev.startTime}–{ev.endTime}
+                    {ev.startDate}{ev.endDate ? ` to ${ev.endDate}` : ""}
+                    {ev.startTime ? ` · ${ev.startTime}` : ""}
+                    {ev.endTime ? `–${ev.endTime}` : ""}
                     {ev.venue ? ` · ${ev.venue}` : ""}
                   </p>
                   <p className="text-xs opacity-60">
-                    {ev.department} · Year {ev.year} · Section {ev.section}
+                    {ev.department} · Year {ev.year}{ev.semester ? ` · Sem ${ev.semester}` : ""} · Section {ev.section}
                   </p>
                 </div>
                 <span className="shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide opacity-70">
@@ -506,14 +511,24 @@ function ManualForm({
         />
       </Field>
       <div className="grid grid-cols-2 gap-3">
-        <Field label="Date">
+        <Field label="Start Date">
           <Input
             type="date"
-            value={draft.date}
-            onChange={(e) => setDraft({ ...draft, date: e.target.value })}
+            value={draft.startDate}
+            onChange={(e) => setDraft({ ...draft, startDate: e.target.value })}
             className="rounded-xl"
           />
         </Field>
+        <Field label="End Date (Optional)">
+          <Input
+            type="date"
+            value={draft.endDate || ""}
+            onChange={(e) => setDraft({ ...draft, endDate: e.target.value })}
+            className="rounded-xl"
+          />
+        </Field>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
         <Field label="Category">
           <Select
             value={draft.category}
@@ -596,6 +611,14 @@ function ManualForm({
               ))}
             </SelectContent>
           </Select>
+        </Field>
+        <Field label="Semester">
+          <Input
+            placeholder="e.g. 1"
+            value={draft.semester || ""}
+            onChange={(e) => setDraft({ ...draft, semester: e.target.value })}
+            className="rounded-xl"
+          />
         </Field>
         <Field label="Section">
           <Select 

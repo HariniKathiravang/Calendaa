@@ -96,19 +96,25 @@ IMPORTANT RULES:
 3. Do not add markdown or ```json wrappers.
 4. If a field is missing or unknown, provide a sensible default (e.g. empty string or "all" for department).
 5. The output MUST be a JSON array `[...]` where each item matches the EXPECTED FORMAT exactly.
+6. If the text mentions 'UG' (Undergraduate) or 'PG' (Postgraduate), put that in the `department` field if a specific department isn't mentioned.
+7. Leave `startTime` and `endTime` empty (as `""`) if a specific time is not mentioned. Do not invent times.
+8. Set `isLlm` to `true` for all extracted events.
 
 EXPECTED EVENT FORMAT (JSON Object):
 {{
     "title": "String (concise name of the event)",
     "description": "String (brief summary, prerequisites, or key details)",
-    "date": "String (YYYY-MM-DD)",
-    "startTime": "String (HH:mm, 24-hour format, use 09:00 if unknown)",
-    "endTime": "String (HH:mm, 24-hour format, use 17:00 if unknown)",
+    "startDate": "String (YYYY-MM-DD)",
+    "endDate": "String (YYYY-MM-DD, or null if it's a single day)",
+    "startTime": "String (HH:mm, 24-hour format, or empty string '' if unknown)",
+    "endTime": "String (HH:mm, 24-hour format, or empty string '' if unknown)",
     "venue": "String (Location, room, or link)",
-    "department": "String (The department it applies to, e.g. CSE, IT, or 'all')",
+    "department": "String (The department it applies to, e.g. CSE, IT, UG, PG, or 'all')",
     "year": "String (e.g. '1', '2', '3', '4', or 'all')",
+    "semester": "String (e.g. '1', '2', '3', etc., or null if unknown)",
     "section": "String (e.g. 'A', 'B', or 'all')",
-    "category": "String (Must be one of: lecture, exam, event, holiday, meeting, workshop)"
+    "category": "String (Must be one of: lecture, exam, event, holiday, meeting, workshop)",
+    "isLlm": true
 }}
 
 OCR TEXT:

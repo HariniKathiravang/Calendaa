@@ -67,14 +67,17 @@ export function ImportEventsDialog({ open, onOpenChange }: { open: boolean; onOp
       {
         title: "New Event",
         description: "",
-        date: new Date().toISOString().split("T")[0],
-        startTime: "09:00",
-        endTime: "10:00",
+        startDate: new Date().toISOString().split("T")[0],
+        endDate: "",
+        startTime: "",
+        endTime: "",
         venue: "",
         department: "all",
         year: "all",
+        semester: "",
         section: "all",
         category: "event",
+        isLlm: false,
       },
     ]);
   };
@@ -119,12 +122,14 @@ export function ImportEventsDialog({ open, onOpenChange }: { open: boolean; onOp
                 <TableHeader>
                   <TableRow>
                     <TableHead>Title</TableHead>
-                    <TableHead>Date</TableHead>
+                    <TableHead>Start Date</TableHead>
+                    <TableHead>End Date</TableHead>
                     <TableHead>Start</TableHead>
                     <TableHead>End</TableHead>
                     <TableHead>Venue</TableHead>
                     <TableHead>Dept</TableHead>
                     <TableHead>Year</TableHead>
+                    <TableHead>Sem</TableHead>
                     <TableHead>Sec</TableHead>
                     <TableHead>Cat</TableHead>
                     <TableHead></TableHead>
@@ -134,12 +139,14 @@ export function ImportEventsDialog({ open, onOpenChange }: { open: boolean; onOp
                   {events.map((ev, i) => (
                     <TableRow key={i}>
                       <TableCell><Input value={ev.title} onChange={(e) => updateEvent(i, "title", e.target.value)} className="w-32 h-8 text-xs" /></TableCell>
-                      <TableCell><Input type="date" value={ev.date} onChange={(e) => updateEvent(i, "date", e.target.value)} className="w-32 h-8 text-xs" /></TableCell>
-                      <TableCell><Input type="time" value={ev.startTime} onChange={(e) => updateEvent(i, "startTime", e.target.value)} className="w-24 h-8 text-xs" /></TableCell>
-                      <TableCell><Input type="time" value={ev.endTime} onChange={(e) => updateEvent(i, "endTime", e.target.value)} className="w-24 h-8 text-xs" /></TableCell>
+                      <TableCell><Input type="date" value={ev.startDate} onChange={(e) => updateEvent(i, "startDate", e.target.value)} className="w-32 h-8 text-xs" /></TableCell>
+                      <TableCell><Input type="date" value={ev.endDate || ""} onChange={(e) => updateEvent(i, "endDate", e.target.value)} className="w-32 h-8 text-xs" /></TableCell>
+                      <TableCell><Input type="time" value={ev.startTime || ""} onChange={(e) => updateEvent(i, "startTime", e.target.value)} className="w-24 h-8 text-xs" /></TableCell>
+                      <TableCell><Input type="time" value={ev.endTime || ""} onChange={(e) => updateEvent(i, "endTime", e.target.value)} className="w-24 h-8 text-xs" /></TableCell>
                       <TableCell><Input value={ev.venue} onChange={(e) => updateEvent(i, "venue", e.target.value)} className="w-24 h-8 text-xs" /></TableCell>
                       <TableCell><Input value={ev.department} onChange={(e) => updateEvent(i, "department", e.target.value)} className="w-16 h-8 text-xs" /></TableCell>
-                      <TableCell><Input value={ev.year} onChange={(e) => updateEvent(i, "year", e.target.value)} className="w-16 h-8 text-xs" /></TableCell>
+                      <TableCell><Input value={ev.year} onChange={(e) => updateEvent(i, "year", e.target.value)} className="w-12 h-8 text-xs" /></TableCell>
+                      <TableCell><Input value={ev.semester || ""} onChange={(e) => updateEvent(i, "semester", e.target.value)} className="w-12 h-8 text-xs" /></TableCell>
                       <TableCell><Input value={ev.section} onChange={(e) => updateEvent(i, "section", e.target.value)} className="w-12 h-8 text-xs" /></TableCell>
                       <TableCell>
                         <Select value={ev.category} onValueChange={(v) => updateEvent(i, "category", v)}>

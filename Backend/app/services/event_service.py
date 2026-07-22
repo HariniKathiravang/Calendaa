@@ -12,13 +12,16 @@ def _row_to_out(e: Event) -> EventOut:
         id=str(e.id),
         title=e.title,
         description=e.description,
-        date=e.date,
+        startDate=e.start_date,
+        endDate=e.end_date,
         startTime=e.start_time,
         endTime=e.end_time,
         venue=e.venue,
         department=e.department,
         year=e.year,
+        semester=e.semester,
         section=e.section_name,
+        isLlm=bool(e.is_llm),
         category=e.category,
     )
 
@@ -53,7 +56,7 @@ def list_events(
     if section and section != "all":
         q = q.filter(or_(Event.section_name == section, Event.section_name == "all", Event.section_name == "All"))
     if month:
-        q = q.filter(Event.date.startswith(month))
+        q = q.filter(Event.start_date.startswith(month))
     if search:
         term = f"%{search.lower()}%"
         q = q.filter(
@@ -63,7 +66,7 @@ def list_events(
                 Event.venue.ilike(term),
             )
         )
-    return [_row_to_out(e) for e in q.order_by(Event.date).all()]
+    return [_row_to_out(e) for e in q.order_by(Event.start_date).all()]
 
 
 def create_event(db: Session, data: EventCreate, user_payload: dict) -> EventOut:
@@ -87,15 +90,18 @@ def create_event(db: Session, data: EventCreate, user_payload: dict) -> EventOut
     event = Event(
         title=data.title,
         description=data.description,
-        date=data.date,
+        start_date=data.startDate,
+        end_date=data.endDate,
         start_time=data.startTime,
         end_time=data.endTime,
         venue=data.venue,
         category=data.category,
         department=data.department,
         year=data.year,
+        semester=data.semester,
         section_name=data.section,
         section_id=section_id,
+        is_llm=1 if data.isLlm else 0,
     )
     db.add(event)
     db.commit()
@@ -147,14 +153,17 @@ def update_event(db: Session, event_id: int, data: EventUpdate, user_payload: di
 
     event.title = data.title
     event.description = data.description
-    event.date = data.date
+    event.start_date = data.startDate
+    event.end_date = data.endDate
     event.start_time = data.startTime
     event.end_time = data.endTime
     event.venue = data.venue
     event.category = data.category
     event.department = data.department
     event.year = data.year
+    event.semester = data.semester
     event.section_name = data.section
+    event.is_llm = 1 if data.isLlm else 0
 
     db.commit()
     db.refresh(event)
@@ -191,15 +200,18 @@ def bulk_create_events(db: Session, data_list: list[EventCreate], user_payload: 
         event = Event(
             title=data.title,
             description=data.description,
-            date=data.date,
+            start_date=data.startDate,
+            end_date=data.endDate,
             start_time=data.startTime,
             end_time=data.endTime,
             venue=data.venue,
             category=data.category,
             department=data.department,
             year=data.year,
+            semester=data.semester,
             section_name=data.section,
             section_id=section_id,
+            is_llm=1 if data.isLlm else 0,
         )
         db.add(event)
         created.append(event)

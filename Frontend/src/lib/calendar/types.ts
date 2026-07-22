@@ -13,14 +13,17 @@ export interface AcademicEvent {
   id: string;
   title: string;
   description: string;
-  date: string; // ISO date (YYYY-MM-DD)
-  startTime: string; // HH:mm
-  endTime: string; // HH:mm
+  startDate: string; // ISO date (YYYY-MM-DD)
+  endDate?: string | null; // ISO date (YYYY-MM-DD)
+  startTime?: string; // HH:mm
+  endTime?: string; // HH:mm
   venue: string;
   department: string;
   year: string;
+  semester?: string | null;
   section: string;
   category: EventCategory;
+  isLlm?: boolean;
 }
 
 export const YEARS = ["I", "II", "III", "IV"] as const;

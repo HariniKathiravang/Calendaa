@@ -11,7 +11,7 @@ interface Props {
 
 export function DayView({ currentDate, events, onEventClick }: Props) {
   const dayEvents = events
-    .filter((e) => isSameDay(new Date(e.date + "T00:00:00"), currentDate))
+    .filter((e) => isSameDay(new Date(e.startDate + "T00:00:00"), currentDate))
     .sort((a, b) => a.startTime.localeCompare(b.startTime));
 
   return (

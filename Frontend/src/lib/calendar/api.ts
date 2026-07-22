@@ -108,14 +108,17 @@ export interface ApiEvent {
   id: string;
   title: string;
   description: string;
-  date: string;
-  startTime: string;
-  endTime: string;
+  startDate: string;
+  endDate?: string | null;
+  startTime?: string;
+  endTime?: string;
   venue: string;
   department: string;
   year: string;
+  semester?: string | null;
   section: string;
   category: string;
+  isLlm?: boolean;
 }
 
 export interface EventFilters {

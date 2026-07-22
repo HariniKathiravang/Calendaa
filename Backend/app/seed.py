@@ -129,7 +129,7 @@ def upsert_event(db, ev, section_obj):
     existing = (
         db.query(Event)
         .filter(Event.title == ev["title"]) 
-        .filter(Event.date == ev["date"]) 
+        .filter(Event.start_date == ev["date"]) 
         .filter(Event.section_id == section_obj.id)
         .one_or_none()
     )
@@ -138,15 +138,18 @@ def upsert_event(db, ev, section_obj):
     event = Event(
         title=ev["title"],
         description=ev.get("description", ""),
-        date=ev["date"],
+        start_date=ev["date"],
+        end_date=None,
         start_time=ev.get("startTime", "00:00"),
         end_time=ev.get("endTime", "00:00"),
         venue=ev.get("venue", ""),
         category=ev.get("category", "event"),
         department=ev["dept"],
         year=ev["year"],
+        semester=None,
         section_name=ev["section"],
         section_id=section_obj.id,
+        is_llm=0,
     )
     db.add(event)
     db.flush()

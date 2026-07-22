@@ -32,18 +32,28 @@ export function EventDetailsDialog({ event, onOpenChange, onEdit, onDelete }: Pr
               {meta.label}
             </span>
           </div>
-          <DialogTitle className="mt-2 text-xl">{event.title}</DialogTitle>
+          <div className="mt-2 flex items-center gap-2">
+            <DialogTitle className="text-xl">{event.title}</DialogTitle>
+            {event.isLlm && (
+              <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-semibold text-indigo-800 border border-indigo-200">
+                ✨ AI Generated
+              </span>
+            )}
+          </div>
           <p className="text-sm text-muted-foreground">
-            {format(new Date(event.date), "EEEE, MMMM d, yyyy")}
+            {format(new Date(event.startDate), "EEEE, MMMM d, yyyy")}
+            {event.endDate ? ` - ${format(new Date(event.endDate), "EEEE, MMMM d, yyyy")}` : ""}
           </p>
         </DialogHeader>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <InfoRow icon={<Clock className="h-4 w-4" />} label={`${event.startTime} – ${event.endTime}`} />
-          <InfoRow icon={<MapPin className="h-4 w-4" />} label={event.venue} />
+          { (event.startTime || event.endTime) && (
+            <InfoRow icon={<Clock className="h-4 w-4" />} label={`${event.startTime || "?"} – ${event.endTime || "?"}`} />
+          )}
+          { event.venue && <InfoRow icon={<MapPin className="h-4 w-4" />} label={event.venue} /> }
           <InfoRow icon={<Layers className="h-4 w-4" />} label={event.department} />
           <InfoRow
             icon={<GraduationCap className="h-4 w-4" />}
-            label={`Year ${event.year} · Section ${event.section}`}
+            label={`Year ${event.year}${event.semester ? ` · Sem ${event.semester}` : ""} · Section ${event.section}`}
           />
         </div>
         <p className="text-sm leading-relaxed text-foreground">{event.description}</p>
