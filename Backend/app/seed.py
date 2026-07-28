@@ -99,6 +99,7 @@ def upsert_admin(db, username: str, password: str, name: str, email: str):
         admin.name = name
         admin.email = email
         db.add(admin)
+
         db.flush()
         return admin
     admin = Admin(username=username, hashed_password=hashed, name=name, email=email)

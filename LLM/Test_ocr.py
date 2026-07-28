@@ -1,22 +1,35 @@
 from pdf2image import convert_from_path
+from PIL import Image
 import pytesseract
 import cv2
 import numpy as np
 import requests
+import json
+import os
 
 # Tesseract path
 pytesseract.pytesseract.tesseract_cmd = (
     r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 )
 
-# PDF path
-pdf_path = "Calendar - 2026-2027.pdf"
+# Input file (PDF or Image)
+input_path = "Calendar - 2026-2027.pdf"
+# Examples:
+# input_path = "calendar.jpg"
+# input_path = "calendar.png"
 
-# Convert PDF -> Images
-pages = convert_from_path(
-    pdf_path,
-    poppler_path=r"C:\Users\Devaprasath\Downloads\Release-26.02.0-0\poppler-26.02.0\Library\bin"
-)
+# Load pages/images
+ext = os.path.splitext(input_path)[1].lower()
+
+if ext == ".pdf":
+    pages = convert_from_path(
+        input_path,
+        poppler_path=r"C:\Users\Devaprasath\Downloads\Release-26.02.0-0\poppler-26.02.0\Library\bin"
+    )
+elif ext in [".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".webp"]:
+    pages = [Image.open(input_path).convert("RGB")]
+else:
+    raise ValueError(f"Unsupported file type: {ext}")
 
 # Store all extracted text
 full_text = ""
@@ -53,9 +66,6 @@ response = requests.post(
 # Final structured output
 print("\n===== STRUCTURED OUTPUT =====\n")
 print(response.json())
-
-
-import json
 
 structured_output = response.json()
 

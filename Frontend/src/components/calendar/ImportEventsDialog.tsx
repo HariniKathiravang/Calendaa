@@ -86,7 +86,7 @@ export function ImportEventsDialog({ open, onOpenChange }: { open: boolean; onOp
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Import Events from PDF</DialogTitle>
+          <DialogTitle>Import Events from Document</DialogTitle>
         </DialogHeader>
 
         {step === "upload" && (
@@ -95,9 +95,9 @@ export function ImportEventsDialog({ open, onOpenChange }: { open: boolean; onOp
               <Upload className="h-12 w-12 text-muted-foreground" />
               <div className="grid w-full max-w-sm items-center gap-1.5">
                 <Input
-                  id="pdf"
+                  id="document"
                   type="file"
-                  accept="application/pdf"
+                  accept="application/pdf,image/png,image/jpeg,image/jpg"
                   onChange={(e) => setFile(e.target.files?.[0] || null)}
                 />
               </div>
@@ -123,14 +123,14 @@ export function ImportEventsDialog({ open, onOpenChange }: { open: boolean; onOp
                   <TableRow>
                     <TableHead>Title</TableHead>
                     <TableHead>Start Date</TableHead>
-                    <TableHead>End Date</TableHead>
-                    <TableHead>Start</TableHead>
-                    <TableHead>End</TableHead>
-                    <TableHead>Venue</TableHead>
-                    <TableHead>Dept</TableHead>
-                    <TableHead>Year</TableHead>
-                    <TableHead>Sem</TableHead>
-                    <TableHead>Sec</TableHead>
+                    {events.some(e => e.endDate) && <TableHead>End Date</TableHead>}
+                    {events.some(e => e.startTime) && <TableHead>Start</TableHead>}
+                    {events.some(e => e.endTime) && <TableHead>End</TableHead>}
+                    {events.some(e => e.venue) && <TableHead>Venue</TableHead>}
+                    {events.some(e => e.department) && <TableHead>Dept</TableHead>}
+                    {events.some(e => e.year) && <TableHead>Year</TableHead>}
+                    {events.some(e => e.semester) && <TableHead>Sem</TableHead>}
+                    {events.some(e => e.section) && <TableHead>Sec</TableHead>}
                     <TableHead>Cat</TableHead>
                     <TableHead></TableHead>
                   </TableRow>
@@ -138,16 +138,16 @@ export function ImportEventsDialog({ open, onOpenChange }: { open: boolean; onOp
                 <TableBody>
                   {events.map((ev, i) => (
                     <TableRow key={i}>
-                      <TableCell><Input value={ev.title} onChange={(e) => updateEvent(i, "title", e.target.value)} className="w-32 h-8 text-xs" /></TableCell>
+                      <TableCell><Input value={ev.title} onChange={(e) => updateEvent(i, "title", e.target.value)} className="min-w-[240px] h-8 text-xs" /></TableCell>
                       <TableCell><Input type="date" value={ev.startDate} onChange={(e) => updateEvent(i, "startDate", e.target.value)} className="w-32 h-8 text-xs" /></TableCell>
-                      <TableCell><Input type="date" value={ev.endDate || ""} onChange={(e) => updateEvent(i, "endDate", e.target.value)} className="w-32 h-8 text-xs" /></TableCell>
-                      <TableCell><Input type="time" value={ev.startTime || ""} onChange={(e) => updateEvent(i, "startTime", e.target.value)} className="w-24 h-8 text-xs" /></TableCell>
-                      <TableCell><Input type="time" value={ev.endTime || ""} onChange={(e) => updateEvent(i, "endTime", e.target.value)} className="w-24 h-8 text-xs" /></TableCell>
-                      <TableCell><Input value={ev.venue} onChange={(e) => updateEvent(i, "venue", e.target.value)} className="w-24 h-8 text-xs" /></TableCell>
-                      <TableCell><Input value={ev.department} onChange={(e) => updateEvent(i, "department", e.target.value)} className="w-16 h-8 text-xs" /></TableCell>
-                      <TableCell><Input value={ev.year} onChange={(e) => updateEvent(i, "year", e.target.value)} className="w-12 h-8 text-xs" /></TableCell>
-                      <TableCell><Input value={ev.semester || ""} onChange={(e) => updateEvent(i, "semester", e.target.value)} className="w-12 h-8 text-xs" /></TableCell>
-                      <TableCell><Input value={ev.section} onChange={(e) => updateEvent(i, "section", e.target.value)} className="w-12 h-8 text-xs" /></TableCell>
+                      {events.some(e => e.endDate) && <TableCell><Input type="date" value={ev.endDate || ""} onChange={(e) => updateEvent(i, "endDate", e.target.value)} className="w-32 h-8 text-xs" /></TableCell>}
+                      {events.some(e => e.startTime) && <TableCell><Input type="time" value={ev.startTime || ""} onChange={(e) => updateEvent(i, "startTime", e.target.value)} className="w-24 h-8 text-xs" /></TableCell>}
+                      {events.some(e => e.endTime) && <TableCell><Input type="time" value={ev.endTime || ""} onChange={(e) => updateEvent(i, "endTime", e.target.value)} className="w-24 h-8 text-xs" /></TableCell>}
+                      {events.some(e => e.venue) && <TableCell><Input value={ev.venue} onChange={(e) => updateEvent(i, "venue", e.target.value)} className="w-24 h-8 text-xs" /></TableCell>}
+                      {events.some(e => e.department) && <TableCell><Input value={ev.department} onChange={(e) => updateEvent(i, "department", e.target.value)} className="w-16 h-8 text-xs" /></TableCell>}
+                      {events.some(e => e.year) && <TableCell><Input value={ev.year} onChange={(e) => updateEvent(i, "year", e.target.value)} className="w-12 h-8 text-xs" /></TableCell>}
+                      {events.some(e => e.semester) && <TableCell><Input value={ev.semester || ""} onChange={(e) => updateEvent(i, "semester", e.target.value)} className="w-12 h-8 text-xs" /></TableCell>}
+                      {events.some(e => e.section) && <TableCell><Input value={ev.section} onChange={(e) => updateEvent(i, "section", e.target.value)} className="w-12 h-8 text-xs" /></TableCell>}
                       <TableCell>
                         <Select value={ev.category} onValueChange={(v) => updateEvent(i, "category", v)}>
                           <SelectTrigger className="w-24 h-8 text-xs"><SelectValue /></SelectTrigger>
@@ -170,7 +170,7 @@ export function ImportEventsDialog({ open, onOpenChange }: { open: boolean; onOp
                   ))}
                   {events.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={10} className="text-center py-4 text-muted-foreground">
+                      <TableCell colSpan={12} className="text-center py-4 text-muted-foreground">
                         No events found.
                       </TableCell>
                     </TableRow>

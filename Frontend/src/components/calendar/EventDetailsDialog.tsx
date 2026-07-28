@@ -33,7 +33,7 @@ export function EventDetailsDialog({ event, onOpenChange, onEdit, onDelete }: Pr
             </span>
           </div>
           <div className="mt-2 flex items-center gap-2">
-            <DialogTitle className="text-xl">{event.title}</DialogTitle>
+            <DialogTitle className="text-xl break-words">{event.title}</DialogTitle>
             {event.isLlm && (
               <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-semibold text-indigo-800 border border-indigo-200">
                 ✨ AI Generated
@@ -47,16 +47,22 @@ export function EventDetailsDialog({ event, onOpenChange, onEdit, onDelete }: Pr
         </DialogHeader>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           { (event.startTime || event.endTime) && (
-            <InfoRow icon={<Clock className="h-4 w-4" />} label={`${event.startTime || "?"} – ${event.endTime || "?"}`} />
+            <InfoRow icon={<Clock className="h-4 w-4" />} label={[event.startTime, event.endTime].filter(Boolean).join(" – ")} />
           )}
           { event.venue && <InfoRow icon={<MapPin className="h-4 w-4" />} label={event.venue} /> }
-          <InfoRow icon={<Layers className="h-4 w-4" />} label={event.department} />
-          <InfoRow
-            icon={<GraduationCap className="h-4 w-4" />}
-            label={`Year ${event.year}${event.semester ? ` · Sem ${event.semester}` : ""} · Section ${event.section}`}
-          />
+          { event.department && <InfoRow icon={<Layers className="h-4 w-4" />} label={event.department} /> }
+          { (event.year || event.section) && (
+            <InfoRow
+              icon={<GraduationCap className="h-4 w-4" />}
+              label={[
+                event.year ? `Year ${event.year}` : "",
+                event.semester ? `Sem ${event.semester}` : "",
+                event.section ? `Section ${event.section}` : ""
+              ].filter(Boolean).join(" · ")}
+            />
+          )}
         </div>
-        <p className="text-sm leading-relaxed text-foreground">{event.description}</p>
+        { event.description && <p className="text-sm leading-relaxed text-foreground break-words">{event.description}</p> }
         {canEdit && (
           <DialogFooter>
             <Button

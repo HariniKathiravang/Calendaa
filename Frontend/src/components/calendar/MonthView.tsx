@@ -77,13 +77,13 @@ export function MonthView({ currentDate, events, onEventClick, onDayClick }: Pro
                         onEventClick(ev);
                       }}
                       className={cn(
-                        "flex items-center gap-1.5 truncate rounded-md border px-2 py-1 text-xs font-medium transition-transform hover:scale-[1.02]",
+                        "flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs font-medium transition-transform hover:scale-[1.02]",
                         meta.color,
                       )}
                     >
-                      <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", meta.dot)} />
-                      <span className="truncate">
-                        {ev.startTime} {ev.title}
+                      <span className={cn("mt-1 h-1.5 w-1.5 shrink-0 rounded-full self-start", meta.dot)} />
+                      <span className="leading-snug break-words">
+                        {ev.startTime ? `${ev.startTime} ` : ""}{ev.title}
                       </span>
                     </span>
                   );

@@ -67,22 +67,33 @@ export function DayView({ currentDate, events, onEventClick }: Props) {
                   </span>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground md:grid-cols-4">
-                  <span className="inline-flex items-center gap-1.5">
-                    <Clock className="h-3.5 w-3.5" />
-                    {ev.startTime} – {ev.endTime}
-                  </span>
-                  <span className="inline-flex items-center gap-1.5">
-                    <MapPin className="h-3.5 w-3.5" />
-                    {ev.venue}
-                  </span>
-                  <span className="inline-flex items-center gap-1.5">
-                    <Layers className="h-3.5 w-3.5" />
-                    {ev.department}
-                  </span>
-                  <span className="inline-flex items-center gap-1.5">
-                    <GraduationCap className="h-3.5 w-3.5" />
-                    Year {ev.year} · Sec {ev.section}
-                  </span>
+                  {(ev.startTime || ev.endTime) && (
+                    <span className="inline-flex items-center gap-1.5 break-words">
+                      <Clock className="h-3.5 w-3.5 shrink-0" />
+                      {[ev.startTime, ev.endTime].filter(Boolean).join(" – ")}
+                    </span>
+                  )}
+                  {ev.venue && (
+                    <span className="inline-flex items-center gap-1.5 break-words">
+                      <MapPin className="h-3.5 w-3.5 shrink-0" />
+                      {ev.venue}
+                    </span>
+                  )}
+                  {ev.department && (
+                    <span className="inline-flex items-center gap-1.5 break-words">
+                      <Layers className="h-3.5 w-3.5 shrink-0" />
+                      {ev.department}
+                    </span>
+                  )}
+                  {(ev.year || ev.section) && (
+                    <span className="inline-flex items-center gap-1.5 break-words">
+                      <GraduationCap className="h-3.5 w-3.5 shrink-0" />
+                      {[
+                        ev.year ? `Year ${ev.year}` : "",
+                        ev.section ? `Sec ${ev.section}` : ""
+                      ].filter(Boolean).join(" · ")}
+                    </span>
+                  )}
                 </div>
               </button>
             );

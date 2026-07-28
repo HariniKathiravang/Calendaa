@@ -75,8 +75,8 @@ async def extract_events_from_pdf(
     payload: dict = Depends(require_admin),
 ):
     """Admin only — extract text from PDF and generate events using LLM. Does NOT save to DB."""
-    if not file.filename.lower().endswith('.pdf'):
-        raise HTTPException(status_code=400, detail="Only PDF files are supported.")
+    if not file.filename.lower().endswith((".pdf", ".png", ".jpg", ".jpeg")):
+        raise HTTPException(status_code=400, detail="Only PDF and Image files are supported.")
         
     pdf_bytes = await file.read()
     try:

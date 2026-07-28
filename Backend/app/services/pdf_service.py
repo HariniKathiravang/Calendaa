@@ -14,15 +14,27 @@ def extract_text_from_pdf_bytes(pdf_bytes: bytes) -> str:
     and extract text using OCR.
     """
     # Convert PDF -> Images
-    pages = convert_from_bytes(
-        pdf_bytes,
-        poppler_path=settings.POPPLER_PATH
-    )
+    try:
+        pages = convert_from_bytes(
+            pdf_bytes,
+            poppler_path=settings.POPPLER_PATH
+        )
+    except Exception as e:
+        # Fallback: maybe it's an image disguised as a PDF (e.g. user selected 'All Files' or renamed a PNG)
+        img_array = np.frombuffer(pdf_bytes, np.uint8)
+        img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+        if img is not None:
+            pages = [img]
+        else:
+            raise e
 
     full_text = ""
     for page in pages:
-        # Convert PIL Image to OpenCV format
-        img = np.array(page)
+        # Convert PIL Image to OpenCV format if it's not already a numpy array
+        if isinstance(page, np.ndarray):
+            img = page
+        else:
+            img = np.array(page)
         
         # Check if image has RGB channels before converting to grayscale
         if len(img.shape) == 3 and img.shape[2] == 3:

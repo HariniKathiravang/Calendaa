@@ -102,24 +102,35 @@ export function WeekView({ currentDate, events, onEventClick, onDayClick }: Prop
                           )}
                         />
                         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                          <span className="truncate text-sm font-semibold leading-snug">
+                          <span className="text-sm font-semibold leading-snug break-words">
                             {ev.title}
                           </span>
                           <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5">
-                            <span className="flex items-center gap-1 text-xs opacity-75">
-                              <Clock className="h-3 w-3 shrink-0" />
-                              {ev.startTime}–{ev.endTime}
-                            </span>
+                            {(ev.startTime || ev.endTime) && (
+                              <span className="flex items-center gap-1 text-xs opacity-75">
+                                <Clock className="h-3 w-3 shrink-0" />
+                                {[ev.startTime, ev.endTime].filter(Boolean).join("–")}
+                              </span>
+                            )}
                             {ev.venue && (
                               <span className="flex items-center gap-1 text-xs opacity-75">
                                 <MapPin className="h-3 w-3 shrink-0" />
-                                <span className="truncate max-w-[160px]">{ev.venue}</span>
+                                <span className="break-words">{ev.venue}</span>
                               </span>
                             )}
                           </div>
-                          <span className="text-[11px] opacity-60">
-                            {ev.department} · {ev.year}-{ev.section}
-                          </span>
+                          {(() => {
+                            const parts = [
+                              ev.department,
+                              ev.year ? `Year ${ev.year}` : "",
+                              ev.section ? `Sec ${ev.section}` : ""
+                            ].filter(Boolean);
+                            return parts.length > 0 ? (
+                              <span className="text-[11px] opacity-60">
+                                {parts.join(" · ")}
+                              </span>
+                            ) : null;
+                          })()}
                         </div>
                         {/* category badge */}
                         <span className="shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide opacity-70">

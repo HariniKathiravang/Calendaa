@@ -301,25 +301,10 @@ function CalendarPage() {
         userMenu={<UserMenu />}
         activeFilterCount={activeFilterCount}
         filters={filters}
+        onDateChange={setCurrentDate}
       />
 
       <main className="mx-auto max-w-[1400px] px-4 py-6 md:px-6 relative group">
-        <Button
-          variant="outline"
-          size="icon"
-          className="absolute left-2 top-1/2 z-10 hidden -translate-y-1/2 rounded-full bg-background/80 shadow-md backdrop-blur transition-all hover:scale-110 hover:bg-background md:flex"
-          onClick={handlePrev}
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          className="absolute right-2 top-1/2 z-10 hidden -translate-y-1/2 rounded-full bg-background/80 shadow-md backdrop-blur transition-all hover:scale-110 hover:bg-background md:flex"
-          onClick={handleNext}
-        >
-          <ChevronRight className="h-5 w-5" />
-        </Button>
         {view === "month" && (
           <MonthView
             currentDate={currentDate}
