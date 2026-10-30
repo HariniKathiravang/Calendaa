@@ -1,4 +1,4 @@
-# Python virtual environment — never commit
+
 venv/
 .venv/
 
@@ -10,8 +10,6 @@ __pycache__/
 *.db
 *.sqlite
 *.sqlite3
-
-# Real environment variables — never commit
 .env
 # .env.vercel and .env.example are safe (no real secrets)
 
